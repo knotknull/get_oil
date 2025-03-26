@@ -1,7 +1,7 @@
 [project]
-name = "get-oil2"
-version = "0.1.0"
-description = "Add your description here"
+name = "get_oil"
+version = "1.0.0"
+description = "Scrape patriotdiscountoi.com for prices"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = []

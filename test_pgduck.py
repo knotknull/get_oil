@@ -1,5 +1,5 @@
-from os import getenv  
 import duckdb  
+# from os import getenv  
 
 ## attach '' as pgsql_pdo (TYPE postgres, SECRET pgsql_pdo, SCHEMA 'public');
 
