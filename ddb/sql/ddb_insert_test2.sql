@@ -1,0 +1,17 @@
+insert into test_prices (price, date, tmstmp) values (3.229, '2025-03-09', current_localtimestamp());
+insert into test_prices (price, date, tmstmp) values (3.229, '2025-03-10', current_localtimestamp());
+insert into test_prices (price, date, tmstmp) values (3.179, '2025-03-11', current_localtimestamp());
+insert into test_prices (price, date, tmstmp) values (3.179, '2025-03-12', current_localtimestamp());
+insert into test_prices (price, date, tmstmp) values (3.079, '2025-03-13', current_localtimestamp());
+insert into test_prices (price, date, tmstmp) values (3.079, '2025-03-14', current_localtimestamp());
+insert into test_prices (price, date, tmstmp) values (2.999, '2025-03-15', current_localtimestamp());
+insert into test_prices (price, date, tmstmp) values (2.999, '2025-03-16', current_localtimestamp());
+insert into test_prices (price, date, tmstmp) values (2.999, '2025-03-17', current_localtimestamp());
+insert into test_prices (price, date, tmstmp) values (2.979, '2025-03-18', current_localtimestamp());
+insert into test_prices (price, date, tmstmp) values (2.979, '2025-03-19', current_localtimestamp());
+insert into test_prices (price, date, tmstmp) values (2.979, '2025-03-20', current_localtimestamp());
+insert into test_prices (price, date, tmstmp) values (2.979, '2025-03-21', current_localtimestamp());
+insert into test_prices (price, date, tmstmp) values (2.979, '2025-03-22', current_localtimestamp());
+insert into test_prices (price, date, tmstmp) values (2.979, '2025-03-23', current_localtimestamp());
+insert into test_prices (price, date, tmstmp) values (2.979, '2025-03-24', current_localtimestamp());
+insert into test_prices (price, date, tmstmp) values (2.939, '2025-03-25', current_localtimestamp());

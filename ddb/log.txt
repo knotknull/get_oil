@@ -1,0 +1,131 @@
+0. get hist.txt, convert to hist.csv via
+map@hexagon:/ddb/> cat hist.txt | sed 's/^Date: //' | sed 's/ PDO Price: //' > hist.csv
+
+
+1. update proc_pdo.sh to create insert statements from hist.csv
+
+2. split output into insert_pdo_prices.sql and insert_test_prices.sql
+map@hexagon:/ddb/> ./proc_pdo.sh > insert_prices.sql    
+
+egrep test_prices insert_prices.sql  > insert_test_prices.sql 
+egrep pdo_prices insert_prices.sql   > insert_pdo_prices.sql 
+
+map@hexagon:/ddb/> head -2 insert_[tp]*prices.sql
+==> insert_pdo_prices.sql <==
+insert into pdo_prices (date, price, tmstmp) values ('2024-01-24', 3.429, current_localtimestamp());
+insert into pdo_prices (date, price, tmstmp) values ('2024-01-29', 3.429, current_localtimestamp());
+
+==> insert_test_prices.sql <==
+insert into test_prices (date, price, tmstmp) values ('2024-01-24', 3.429, current_localtimestamp());
+insert into test_prices (date, price, tmstmp) values ('2024-01-29', 3.429, current_localtimestamp());
+
+3. create duckdb schema 
+schema.sql:
+CREATE TABLE pdo_prices (
+	date  DATE PRIMARY KEY, 
+	price DECIMAL(10,3), 
+	tmstmp TIMESTAMP
+);
+
+CREATE TABLE test_prices (
+	date  DATE PRIMARY KEY, 
+	price DECIMAL(10,3), 
+	tmstmp TIMESTAMP
+);
+
+4. create duckdb via
+duckdb pdo_prices.ddb  < schema.sql
+
+
+5. insert test data and validate
+duckdb pdo_prices.ddb  < insert_test_prices.sql
+D select * from test_prices limit 5;
+┌────────────┬───────────────┬─────────────────────────┐
+│    date    │     price     │         tmstmp          │
+│    date    │ decimal(10,3) │        timestamp        │
+├────────────┼───────────────┼─────────────────────────┤
+│ 2024-01-24 │         3.429 │ 2025-02-25 22:57:02.905 │
+│ 2024-01-29 │         3.429 │ 2025-02-25 22:57:02.91  │
+│ 2024-01-30 │         3.429 │ 2025-02-25 22:57:02.912 │
+│ 2024-01-31 │         3.429 │ 2025-02-25 22:57:02.914 │
+│ 2024-02-02 │         3.429 │ 2025-02-25 22:57:02.916 │
+└────────────┴───────────────┴─────────────────────────┘
+
+
+6. insert actual data and validate
+duckdb pdo_prices.ddb  < insert_pdo_prices.sql
+
+
+D select * from pdo_prices order by date desc limit 5;
+┌────────────┬───────────────┬─────────────────────────┐
+│    date    │     price     │         tmstmp          │
+│    date    │ decimal(10,3) │        timestamp        │
+├────────────┼───────────────┼─────────────────────────┤
+│ 2025-02-25 │         3.339 │ 2025-02-25 22:58:35.485 │
+│ 2025-02-24 │         3.339 │ 2025-02-25 22:58:35.482 │
+│ 2025-02-23 │         3.339 │ 2025-02-25 22:58:35.48  │
+│ 2025-02-22 │         3.339 │ 2025-02-25 22:58:35.478 │
+│ 2025-02-21 │         3.439 │ 2025-02-25 22:58:35.475 │
+└────────────┴───────────────┴─────────────────────────┘
+
+
+7. Test an upsert with the latest date 
+
+
+INSERT INTO test_prices (date, price, tmstmp)
+    VALUES ('2025-02-25', 3.339 , current_localtimestamp())
+    ON CONFLICT (date) DO UPDATE SET price = EXCLUDED.price, tmstmp = EXCLUDED.tmstmp;
+
+## BEFORE    
+D select * from test_prices order by date desc limit 5;
+┌────────────┬───────────────┬─────────────────────────┐
+│    date    │     price     │         tmstmp          │
+│    date    │ decimal(10,3) │        timestamp        │
+├────────────┼───────────────┼─────────────────────────┤
+│ 2025-02-25 │         3.339 │ 2025-02-25 22:57:03.189 │
+│ 2025-02-24 │         3.339 │ 2025-02-25 22:57:03.187 │
+│ 2025-02-23 │         3.339 │ 2025-02-25 22:57:03.185 │
+│ 2025-02-22 │         3.339 │ 2025-02-25 22:57:03.182 │
+│ 2025-02-21 │         3.439 │ 2025-02-25 22:57:03.18  │
+└────────────┴───────────────┴─────────────────────────┘
+D INSERT INTO test_prices (date, price, tmstmp)
+      VALUES ('2025-02-25', 3.339 , current_localtimestamp())
+      ON CONFLICT (date) DO UPDATE SET price = EXCLUDED.price, tmstmp = EXCLUDED.tmstmp;
+D 
+## AFTER    
+D select * from test_prices order by date desc limit 5;
+┌────────────┬───────────────┬─────────────────────────┐
+│    date    │     price     │         tmstmp          │
+│    date    │ decimal(10,3) │        timestamp        │
+├────────────┼───────────────┼─────────────────────────┤
+│ 2025-02-25 │         3.339 │ 2025-02-25 23:00:08.867 │
+│ 2025-02-24 │         3.339 │ 2025-02-25 22:57:03.187 │
+│ 2025-02-23 │         3.339 │ 2025-02-25 22:57:03.185 │
+│ 2025-02-22 │         3.339 │ 2025-02-25 22:57:03.182 │
+│ 2025-02-21 │         3.439 │ 2025-02-25 22:57:03.18  │
+└────────────┴───────────────┴─────────────────────────┘
+
+
+
+8. TODO, write python script to open, read and write pdo_prices.ddb
+
+9. create an upsert function for pdo_prices and simulate a web pull and then write
+D INSERT INTO test_prices (date, price, tmstmp)
+      VALUES ('2025-02-25', 3.339 , current_localtimestamp())
+      ON CONFLICT (date) DO UPDATE SET price = EXCLUDED.price, tmstmp = EXCLUDED.tmstmp;
+
+10. replace simulated code with actual web pull code and then call upsert function with the date and the price
+
+11. run multiple times to ensure write
+12. setup uv env 
+
+13. enchance to write against PostGRES as well. 
+
+
+## run a virtual env from cron
+This has to be in script: 
+
+#!/bin/bash
+PATH=....
+source /home/josecarlos/Workspace/python/robot2-rss/venv/bin/activate 
+python /home/josecarlos/Workspace/python/robot2-rss/main.py R,1

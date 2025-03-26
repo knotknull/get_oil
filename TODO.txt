@@ -1,0 +1,151 @@
+
+
+1. identify upsert syntax for duckdb and pgsql        ## DONE
+
+## postgresql upsert (INSERT / CONFLICT)
+## duckdb upsert (INSERT / CONFLICT)
+NOTE: THE pgsql syntax works on duckdb !!!
+
+INSERT INTO test_prices (date, price, tmstmp)
+      VALUES ('2025-03-25', 2.939 , CURRENT_TIMESTAMP)
+      ON CONFLICT (date) DO UPDATE SET price = EXCLUDED.price, tmstmp = EXCLUDED.tmstmp;
+
+INSERT INTO pdo_prices (date, price, tmstmp)
+      VALUES ('2025-03-25', 2.939 , CURRENT_TIMESTAMP)
+      ON CONFLICT (date) DO UPDATE SET price = EXCLUDED.price, tmstmp = EXCLUDED.tmstmp;
+
+
+
+2. set .env files                                     ## DONE
+ - create a .env.test and a env.live file 
+ - these should have the DUCKDB and PGSQL variables, etc. 
+
+
+
+3. create a utils directory and put the following code in there:    DONE
+ - get_pdo_price
+ - write_pdo
+   NOTE: first pass just connect and print 
+            i.e. get website data and just select count(*) database connections
+                  test that you can connect to pgsql and ddb
+        second pass for real
+      - write_pdo_ddb(dt, price )       ## write to duckdbb
+      - write_pdo_pgsql(dt, price)      ## write to duckdbl
+NOTE:  DuckDB is working great but PGSQL is connecting but writing to the wrong table.
+
+4. Let's use the awesome duckdb to connect to pgsql for us and update     DONE
+
+INSERT INTO pdo_prices (date, price, tmstmp)
+      VALUES ('2025-03-25', 2.939 , CURRENT_TIMESTAMP)
+      ON CONFLICT (date) DO UPDATE SET price = EXCLUDED.price, tmstmp = EXCLUDED.tmstmp;
+
+INSERT INTO test_prices (date, price, tmstmp)
+      VALUES ('2025-03-25', 2.939 , CURRENT_TIMESTAMP)
+      ON CONFLICT (date) DO UPDATE SET price = EXCLUDED.price, tmstmp = EXCLUDED.tmstmp;
+
+
+CREATE PERSISTENT SECRET pgsql_pdo (
+    TYPE postgres,
+    HOST '192.168.99.56',
+    PORT 5432,
+    DATABASE pdo_prices,
+    USER 'pguser',
+    PASSWORD 'pguser.db.pa55'
+);
+
+
+CREATE PERSISTENT SECRET pgsql_pdo_dev (
+    TYPE postgres,
+    HOST '192.168.99.56',
+    PORT 5432,
+    DATABASE pdo_prices_dev,
+    USER 'pguser',
+    PASSWORD 'pguser.db.pa55'
+);
+
+attach '' as pgsql_pdo (TYPE postgres, SECRET pgsql_pdo, SCHEMA 'public');
+show all tables;
+
+┌───────────┬─────────┬─────────────┬───────────────────────┬──────────────────────────────────┬───────────┐
+│ database  │ schema  │    name     │     column_names      │           column_types           │ temporary │
+│  varchar  │ varchar │   varchar   │       varchar[]       │            varchar[]             │  boolean  │
+├───────────┼─────────┼─────────────┼───────────────────────┼──────────────────────────────────┼───────────┤
+│ pgsql_pdo │ public  │ pdo_prices  │ [date, price, tmstmp] │ [DATE, DECIMAL(10,3), TIMESTAMP] │ false     │
+│ pgsql_pdo │ public  │ test_prices │ [date, price, tmstmp] │ [DATE, DECIMAL(10,3), TIMESTAMP] │ false     │
+└───────────┴─────────┴─────────────┴───────────────────────┴──────────────────────────────────┴───────────┘
+
+D select * from pgsql_pdo.pdo_prices where date='2025-03-25'
+  union
+  select * from pgsql_pdo.test_prices where date='2025-03-25';
+┌────────────┬───────────────┬────────────────────────────┐
+│    date    │     price     │           tmstmp           │
+│    date    │ decimal(10,3) │         timestamp          │
+├────────────┼───────────────┼────────────────────────────┤
+│ 2025-03-25 │         2.939 │ 2025-03-25 23:51:48.70989  │
+│ 2025-03-25 │         2.939 │ 2025-03-25 14:11:48.265363 │
+└────────────┴───────────────┴────────────────────────────┘
+
+
+
+## FYI, the below works for connecting duckdb to pgsql.  
+## NOTE: Upserts aren't supported so we have to do a count then update or insert
+##       see duckdb code for logic
+
+from os import getenv  
+import duckdb  
+
+## attach '' as pgsql_pdo (TYPE postgres, SECRET pgsql_pdo, SCHEMA 'public');
+
+con = duckdb.connect()  
+## con.sql(f"""
+##     INSTALL postgres;
+##     LOAD postgres;  
+##     ATTACH '' as pgsql_pdo (TYPE postgres, SECRET pgsql_pdo, SCHEMA 'public');
+## """)
+con.sql("""
+    INSTALL postgres;
+    LOAD postgres;  
+    ATTACH '' as pgsql_pdo (TYPE postgres, SECRET pgsql_pdo, SCHEMA 'public');
+""")
+
+con.sql("select * from pgsql_pdo.pdo_prices where date = '2025-03-25';").show()
+con.sql("select * from pgsql_pdo.test_prices where date = '2025-03-25';").show()
+table_name="pgsql_pdo.pdo_prices"
+result = con.execute(
+            f"SELECT COUNT(*) FROM {table_name} WHERE date = ?", 
+            ['2025-03-25']
+        ).fetchone()
+print(result)        
+
+
+
+
+5. create a separate log out for sql      DONE  
+         - log_sql(dbname, sqlstring )        ## write to log and log.sql
+
+6. add log_sql 
+
+7. test log_sql
+
+8. refactor getpdo.py
+
+
+
+## to activate
+source .venv/bin/activate
+
+## to deactivate
+deactivate
+
+## BELOW IS PRIOR TODO LIST 
+
+
+
+## run a virtual env from cron
+This has to be in script: 
+
+#!/bin/bash
+PATH=....
+source /home/josecarlos/Workspace/python/robot2-rss/venv/bin/activate 
+python /home/josecarlos/Workspace/python/robot2-rss/main.py R,1
+

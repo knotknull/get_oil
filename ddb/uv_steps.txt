@@ -1,0 +1,18 @@
+## update uv 
+## 
+uv self update
+
+## initialize app
+## 
+uv init --app ddb
+
+## create venv
+## NOTE: Activate with: source .venv/bin/activate 
+## 
+uv venv
+
+## add packages
+uv add BeautifulSoup4 
+uv add requests 
+uv add datetime 
+uv add duckdb 

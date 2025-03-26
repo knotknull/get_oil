@@ -1,0 +1,98 @@
+
+uv add duckdb
+
+###################################
+
+import duckdb
+import pandas as pd 
+
+df = pd.DataFrame({"value": [10, 20, 30, 40, 50]})
+result = duckdb.query("SELECT AVG(value) as avg_value FROM df").to_df()
+print(result)
+
+
+
+###################################
+import duckdb 
+
+def main() -> None:
+    # read data from csv file
+    with duckdb.connect() as conn:
+        relation = conn.read_csv("data/employees.csv")
+        conn.register("employees", realation)
+
+        # Qquery the Data frame using DuckDB SQL 
+        query = """
+            SELECT name, job_title, salary, 
+            FROM employeesWHERE salary > 124000
+            LIMIT 3
+        """
+
+        result_df = conn.execute(query).fetchdf()
+
+        print("3 records with a high salary (>124k):")
+        print(result_df)
+
+        # get the full table as a datafraom 
+        full_df=relation.to_df()
+
+        # apply a filter to the DataFrame
+        # below is a pandas version o fthe above query
+        # 
+        filtered_df = full_df[full_df["salary"] > 125000][
+           ["name", "job_title", "salary"]
+        ].head(3)
+        print("3 records with a high salary:") 
+
+
+###################################
+import duckdb 
+
+def main() -> None:
+    with duckdb.connect() as conn:
+        # Read data from CSV file
+        employees  = conn.read_csv("data/employees.csv")
+
+        # Preview data from employees data
+        data = conn.execute("SELECT * FROM employees").fetchdf()
+        print(data)
+
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+###################################
+import duckdb
+
+
+def main() -> None:
+    # Path to the persistent DuckDB database file
+    db_path = "employees_db.duckdb"
+
+    with duckdb.connect(database=db_path, read_only=False) as conn:
+        # Read data from CSV file into a relation
+        employees = conn.read_csv("data/employees.csv")   ## Does this make sense ??
+
+        # # Insert a new record into the employees table
+        # conn.execute("INSERT INTO employees VALUES ('Alice', 'Manager', 5000)")
+
+        # Preview data from the employees table
+        data = conn.execute("SELECT * FROM employees").fetchdf()
+        print("Preview of the employees table:")
+        print(data)
+
+
+if __name__ == "__main__":
+    main()
+
+
+https://github.com/ArjanCodes/examples/tree/main/2025/duckdb
+
+https://youtu.be/8SYQtpSk_OI?si=yt5UfxQA2TR7ZMtV
+
+
+
+.

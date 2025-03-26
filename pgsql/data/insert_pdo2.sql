@@ -1,0 +1,17 @@
+insert into pdo_prices (price, date, tmstmp) values (3.229, '2025-03-09', CURRENT_TIMESTAMP);
+insert into pdo_prices (price, date, tmstmp) values (3.229, '2025-03-10', CURRENT_TIMESTAMP);
+insert into pdo_prices (price, date, tmstmp) values (3.179, '2025-03-11', CURRENT_TIMESTAMP);
+insert into pdo_prices (price, date, tmstmp) values (3.179, '2025-03-12', CURRENT_TIMESTAMP);
+insert into pdo_prices (price, date, tmstmp) values (3.079, '2025-03-13', CURRENT_TIMESTAMP);
+insert into pdo_prices (price, date, tmstmp) values (3.079, '2025-03-14', CURRENT_TIMESTAMP);
+insert into pdo_prices (price, date, tmstmp) values (2.999, '2025-03-15', CURRENT_TIMESTAMP);
+insert into pdo_prices (price, date, tmstmp) values (2.999, '2025-03-16', CURRENT_TIMESTAMP);
+insert into pdo_prices (price, date, tmstmp) values (2.999, '2025-03-17', CURRENT_TIMESTAMP);
+insert into pdo_prices (price, date, tmstmp) values (2.979, '2025-03-18', CURRENT_TIMESTAMP);
+insert into pdo_prices (price, date, tmstmp) values (2.979, '2025-03-19', CURRENT_TIMESTAMP);
+insert into pdo_prices (price, date, tmstmp) values (2.979, '2025-03-20', CURRENT_TIMESTAMP);
+insert into pdo_prices (price, date, tmstmp) values (2.979, '2025-03-21', CURRENT_TIMESTAMP);
+insert into pdo_prices (price, date, tmstmp) values (2.979, '2025-03-22', CURRENT_TIMESTAMP);
+insert into pdo_prices (price, date, tmstmp) values (2.979, '2025-03-23', CURRENT_TIMESTAMP);
+insert into pdo_prices (price, date, tmstmp) values (2.979, '2025-03-24', CURRENT_TIMESTAMP);
+insert into pdo_prices (price, date, tmstmp) values (2.939, '2025-03-25', CURRENT_TIMESTAMP);
