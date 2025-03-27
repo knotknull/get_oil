@@ -93,20 +93,19 @@ def store_price(price_value, current_date=None, test_mode=False):
         if result[0] > 0:
             # Update existing record
             conn.execute(
-                f"UPDATE {table_name} SET price = ?, tmstmp = ? WHERE date = ?",
-                [float(price_value), timestamp, current_date]
+                f"UPDATE {table_name} SET price = ?, tmstmp = CURRENT_TIMESTAMP WHERE date = ?",
+                [float(price_value), current_date]
             )
             logger.info(f"Updated price {price_value} for {current_date} in DuckDB {table_name}")
-            log_sql("duckdb", f"UPDATE {table_name} SET price = {price_value}, tmstmp = {timestamp} WHERE date = {current_date}")
+            log_sql("duckdb", f"UPDATE {table_name} SET price = {price_value}, tmstmp = CURRENT_TIMESTAMP WHERE date = {current_date}")
         else:
             # Insert new record
             conn.execute(
-                f"INSERT INTO {table_name} (date, price, tmstmp) VALUES (?, ?, ?)",
-                [current_date, float(price_value), timestamp]
+                f"INSERT INTO {table_name} (date, price, CURRENT_TIMESTAMP) VALUES (?, ?, ?)",
+                [current_date, float(price_value) ]
             )
             logger.info(f"Inserted price {price_value} for {current_date} in DuckDB {table_name}")
-            log_sql("duckdb", f"INSERT INTO  {table_name}  (date, price, tmstmp) VALUE (?, ?, ?)", 
-                    [current_date, float(price_value), timestamp])
+            log_sql("duckdb", f"INSERT INTO  {table_name}  (date, price, tmstmp) VALUE ({current_date}, {price_value}, {timestamp})") 
         
         conn.close()
         return True

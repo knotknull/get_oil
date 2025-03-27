@@ -93,29 +93,28 @@ def store_price(price_value, current_date=None, test_mode=False):
         
         # Check if record exists for this date
         result = con.execute(
-            f"SELECT COUNT(*) FROM pgsql_pdo.{table_name} WHERE date = ?", 
-            [current_date]
+            f"SELECT COUNT(*) FROM pgsql_pdo.{table_name} WHERE date = ?", [current_date]
         ).fetchone()
         ## result = con.execute( f"SELECT COUNT(*) FROM pgsql_pdo.{table_name}", ).fetchone()
         
         if result[0] > 0:
             # Update existing record
             con.execute(
-                f"UPDATE pgsql_pdo.{table_name} SET price = ?, tmstmp = ? WHERE date = ?",
-                [float(price_value), timestamp, current_date]
+                f"UPDATE pgsql_pdo.{table_name} SET price = ?, tmstmp = CURRENT_TIMESTAMP WHERE date = ?",
+                [float(price_value), current_date]
             )
             logger.info(f"Updated price {price_value} for {current_date} in PosgreSQL pgsql_pdo.{table_name}")
-            log_sql("pgsql", f"UPDATE {table_name} SET price = {price_value}, tmstmp = {timestamp} WHERE date = {current_date}")
+            log_sql("pgsql", f"UPDATE {table_name} SET price = {price_value}, tmstmp = CURRENT_TIMESTAMP WHERE date = {current_date}")
 
         else:
             # Insert new record
             con.execute(
-                f"INSERT INTO pgsql_pdo.{table_name} (date, price, tmstmp) VALUES (?, ?, ?)",
-                [current_date, float(price_value), timestamp]
+                f"INSERT INTO pgsql_pdo.{table_name} (date, price, tmstmp) VALUES (?, ?, CURRENT_TIMESTAMP)",
+                [current_date, float(price_value)]
             )
             logger.info(f"Inserted price {price_value} for {current_date} in PosgreSQL pgsql_pdo.{table_name}")
-            log_sql("pgsql", f"INSERT INTO  {table_name}  (date, price, tmstmp) VALUE (?, ?, ?)",  
-                    [current_date, float(price_value), timestamp])
+            log_sql("pgsql", f"INSERT INTO  {table_name}  (date, price, tmstmp) VALUE ({current_date}, {price_value}, CURRENT_TIMESTAMP)")  
+                    
             
         con.close()
         return True

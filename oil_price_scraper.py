@@ -9,12 +9,13 @@ import argparse
 import logging
 # import os
 import sys
-from datetime import date
+from datetime import date, datetime
 
 from scraper import scrape_oil_price, ScraperError
 from db_duckdb import store_price as store_price_duckdb, DuckDBError
 from db_ddb2pg import store_price as store_price_postgres, PGDuckDBError
-from config import LOG_FORMAT, LOG_LEVEL, PG_USER, PG_PASS, PG_DATABASE, DDB_PATH, DDB_TBL
+from db_sqllog import log_sql
+from config import LOG_FORMAT, LOG_LEVEL, PG_USER, PG_PASS, PG_DATABASE, DDB_PATH, DDB_TBL, TEST_TABLE, MAIN_TABLE
 
 # Set up logger
 logging.basicConfig(
@@ -89,6 +90,10 @@ def main():
     # Set test mode flag
     test_mode = args.test
     
+    # Set timetstampe and table_name
+    timestamp = datetime.now()
+    table_name = TEST_TABLE if test_mode else MAIN_TABLE
+    
     # Log startup information
     logger.info("Starting home heating oil price scraper")
     logger.info(f"Test mode: {test_mode}")
@@ -100,7 +105,9 @@ def main():
         # Scrape oil price from website
         price = scrape_oil_price()
         logger.info(f"Successfully scraped oil price: {price}")
-        
+        log_sql("scraper", f"INSERT INTO  {table_name}  (date, price, tmstmp) VALUE ({current_date}, {price}, {timestamp})")
+        ##            [current_date, float(price), timestamp])
+         
         # Store in DuckDB if enabled
         if use_duckdb:
             try:

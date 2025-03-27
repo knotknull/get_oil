@@ -44,7 +44,7 @@ fi
 
 # Run the scraper
 echo "Running oil price scraper..." >> "${LOG_FILE}"
-"${PYTHON}" -m oil_price_scraper.py "$@"
+"${PYTHON}" oil_price_scraper.py "$@"
 
 # Capture exit code
 EXIT_CODE=$?
