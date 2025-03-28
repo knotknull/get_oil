@@ -80,6 +80,9 @@ def main():
     
     # Parse date if provided
     current_date = None
+    if current_date is None:
+        current_date = date.today()
+    
     if args.date:
         try:
             current_date = date.fromisoformat(args.date)

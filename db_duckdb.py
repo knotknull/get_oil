@@ -75,7 +75,7 @@ def store_price(price_value, current_date=None, test_mode=False):
     timestamp = datetime.now()
     table_name = TEST_TABLE if test_mode else MAIN_TABLE
    
-    logger.info(f"DDB_SQL: INSERT INTO {table_name} (date, price, tmstmp) VALUES ({current_date}, {price_value}, {timestamp}")
+    logger.info(f"DDB_SQL: INSERT INTO {table_name} (date, price, tmstmp) VALUES ({current_date}, {price_value}, {timestamp})")
     
     try:
         # Ensure database exists
@@ -101,11 +101,11 @@ def store_price(price_value, current_date=None, test_mode=False):
         else:
             # Insert new record
             conn.execute(
-                f"INSERT INTO {table_name} (date, price, CURRENT_TIMESTAMP) VALUES (?, ?, ?)",
+                f"INSERT INTO {table_name} (date, price, tmstmp) VALUES (?, ?, CURRENT_TIMESTAMP)",
                 [current_date, float(price_value) ]
             )
             logger.info(f"Inserted price {price_value} for {current_date} in DuckDB {table_name}")
-            log_sql("duckdb", f"INSERT INTO  {table_name}  (date, price, tmstmp) VALUE ({current_date}, {price_value}, {timestamp})") 
+            log_sql("duckdb", f"INSERT INTO  {table_name}  (date, price, tmstmp) VALUE ({current_date}, {price_value}, CURRENT_TIMESTAMP)") 
         
         conn.close()
         return True

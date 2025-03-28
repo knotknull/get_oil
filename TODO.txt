@@ -123,11 +123,11 @@ print(result)
 5. create a separate log out for sql      DONE  
          - log_sql(dbname, sqlstring )        ## write to log and log.sql
 
-6. add log_sql 
+6. add log_sql       DONE
 
-7. test log_sql
+7. test log_sql       DONE
 
-8. refactor getpdo.py
+8. refactor getpdo.py DONE
 
 
 
