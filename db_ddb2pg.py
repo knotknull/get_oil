@@ -2,10 +2,7 @@
 PostgreSQL operations for storing oil price data.
 """
 import logging
-# import os
 from datetime import date, datetime
-# from decimal import Decimal
-
 import duckdb
 
 from config import MAIN_TABLE, TEST_TABLE
@@ -33,11 +30,13 @@ def ensure_db_exists():
         
         # Connect to DuckDB to PGSQL
         con = duckdb.connect()  
-        ## con.sql(f"""
-        ##     INSTALL postgres;
-        ##     LOAD postgres;  
-        ##     ATTACH '' as pgsql_pdo (TYPE postgres, SECRET pgsql_pdo, SCHEMA 'public');
-        ## """)
+        ## 
+        ## We are using duckdb connectivity to PostgreSQL via the postgres extension. 
+        ## This is a complete but working hack because psycopg / sqlalchemy wasn't playing nice  
+        ## Here you install the postgres extension in duckdb and then load it. This is followed 
+        ## by setting up a named connection (ATTACH '' as ..... ) and then utilizing name in the query from statement:   
+        ##    f"SELECT COUNT(*) FROM pgsql_pdo.{table_name} WHERE date = ?", [current_date]
+        ## 
         con.sql("""
             INSTALL postgres;
             LOAD postgres;  
@@ -74,16 +73,10 @@ def store_price(price_value, current_date=None, test_mode=False):
     logger.info(f"PGSQL: INSERT INTO {table_name} (date, price, tmstmp) VALUES ({current_date}, {price_value}, {timestamp}")
     
     try:
-        # Ensure database exists
-        # ensure_db_exists()
         
-        # Connect to DuckDB
+        # Connect to DuckDB using the PostgreSQL extension
+        # 
         con = duckdb.connect()  
-        ## con.sql(f"""
-        ##     INSTALL postgres;
-        ##     LOAD postgres;  
-        ##     ATTACH '' as pgsql_pdo (TYPE postgres, SECRET pgsql_pdo, SCHEMA 'public');
-        ## """)
         con.sql("""
             INSTALL postgres;
             LOAD postgres;  

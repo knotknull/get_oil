@@ -4,11 +4,8 @@ DuckDB operations for storing oil price data.
 import logging
 import os
 from datetime import date, datetime
-# from decimal import Decimal
-
 import duckdb
 
-## from .config import DDB_FULL_PATH, MAIN_TABLE, TEST_TABLE
 from config import DDB_FULL_PATH, MAIN_TABLE, TEST_TABLE
 from db_sqllog import  log_sql
 
@@ -38,6 +35,7 @@ def ensure_db_exists():
         # Connect to DuckDB
         conn = duckdb.connect(DDB_FULL_PATH)
         
+        ## SKIPPING THIS ...
         ## # Create tables if they don't exist
         ## for table_name in [MAIN_TABLE, TEST_TABLE]:
         ##     conn.execute(f"""

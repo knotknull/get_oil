@@ -7,7 +7,6 @@ in both DuckDB and PostgreSQL databases.
 """
 import argparse
 import logging
-# import os
 import sys
 from datetime import date, datetime
 
@@ -109,7 +108,6 @@ def main():
         price = scrape_oil_price()
         logger.info(f"Successfully scraped oil price: {price}")
         log_sql("scraper", f"INSERT INTO  {table_name}  (date, price, tmstmp) VALUE ({current_date}, {price}, {timestamp})")
-        ##            [current_date, float(price), timestamp])
          
         # Store in DuckDB if enabled
         if use_duckdb:

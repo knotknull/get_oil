@@ -1,14 +1,6 @@
 import duckdb  
-# from os import getenv  
-
-## attach '' as pgsql_pdo (TYPE postgres, SECRET pgsql_pdo, SCHEMA 'public');
 
 con = duckdb.connect()  
-## con.sql(f"""
-##     INSTALL postgres;
-##     LOAD postgres;  
-##     ATTACH '' as pgsql_pdo (TYPE postgres, SECRET pgsql_pdo, SCHEMA 'public');
-## """)
 con.sql("""
     INSTALL postgres;
     LOAD postgres;  

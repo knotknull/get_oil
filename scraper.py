@@ -120,7 +120,6 @@ def scrape_oil_price():
 
         ## set the search text
         ## srch_text = "Today’s Oil Price"
-
         ## 
         ## THIS IS WHAT WE ARE SEARCHING FOR 
         ## 
@@ -132,18 +131,16 @@ def scrape_oil_price():
         ## find all tags named div and return text inside
         ## works  
         ## findit = soup.find_all(lambda tag: tag.name == "div" and  srch_text in tag.text)
-        ## works  
+        ## 
         now=datetime.now()
         ## for item in soup.find(lambda tag: tag.name == "div" and  srch_text in tag.text):
         for item in soup.find(lambda tag: tag.name == "div" and  PRICE_IDENTIFIER in tag.text):
             ## if(srch_text in item.text ):    
             if(PRICE_IDENTIFIER in item.text ):    
-                ## WORKS stubby=re.findall("Today’s Oil Price[0-9.]+",item.text ) 
                 ## Found Today's Oil Price
                 pdo_price=re.findall("[0-9.]+",item.text ) 
-                ## Pull out the price
+                ## Pull out the price and print
                 the_price=pdo_price[0]
-                ## print("PDO Price: "+ the_price) 
                 print(f'Date: {now:%Y%m%d}, PDO Price: {the_price}')
 
                 logger.info(f"Date: {now:%Y%m%d}, Found price: ${the_price}")
