@@ -116,7 +116,7 @@ def main():
                 logger.info("Successfully stored in DuckDB")
             except DuckDBError as e:
                 logger.error(f"DuckDB storage failed: {e}")
-                return 1
+                # return 1      # Don't exit on DuckDB error
         
         # Store in PostgreSQL if enabled
         if use_postgres:
@@ -125,7 +125,7 @@ def main():
                 logger.info("Successfully stored in PostgreSQL")
             except PGDuckDBError as e:
                 logger.error(f"PostgreSQL storage failed: {e}")
-                return 1
+                # return 1      # Don't exit on PostgreSQL error
         
         logger.info("Oil price scraper completed successfully")
         return 0
